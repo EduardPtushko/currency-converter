@@ -1,0 +1,49 @@
+.switchLabel {
+	position: relative;
+	margin-left: 1rem;
+	top: 5px;
+}
+
+.switchInput {
+	border: 0px;
+	clip: rect(0px, 0px, 0px, 0px);
+	height: 1px;
+	width: 1px;
+	margin: -1px;
+	padding: 0px;
+	overflow: hidden;
+	white-space: nowrap;
+	position: absolute;
+	z-index: 1;
+}
+
+.switchContainer {
+	width: 40px;
+	height: 20px;
+	background-color: rgba(222, 229, 233, 0.699);
+	display: inline-flex;
+	border-radius: 15px;
+	transition: background-color 0.3s;
+}
+.switchContainer.checked {
+	background-color: rgba(192, 208, 218, 0.699);
+}
+
+.switchThumb {
+	box-sizing: border-box;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	display: inline;
+	position: absolute;
+	background-color: rgb(130, 130, 185);
+	right: 50%;
+	transition: all 0.3s;
+}
+.switchThumb.checked {
+	width: 21px;
+	height: 21px;
+	border: 2px solid rgb(158, 158, 190);
+	background-color: rgb(61, 61, 194);
+	right: 0px;
+}
