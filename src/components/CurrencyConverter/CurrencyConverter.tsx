@@ -1,17 +1,55 @@
-import { useState } from 'react'
+import { atom, selector, useRecoilState } from 'recoil'
 import Commission from '../Commission'
+import { commissionEnabledState, commissionState } from '../Commission/Commission'
 import IconArrowRight from '../Icons/IconArrowRight'
 import InputGroup from '../InputGroup'
 import styles from './CurrencyConverter.module.css'
 
-const CurrencyConverter: React.FC = () => {
-	const [usd, setUsd] = useState(0)
-	const [eur, setEur] = useState(0)
-	const exchangeRate = 0.85
+const exchangeRate = 0.83
 
-	const handleEurChange = (amount: number) => {
-		setEur(usd * exchangeRate * amount)
-	}
+export const addCommission = (amount: number, commission: number) => {
+	return amount / (1 - commission / 100)
+}
+
+export const removeCommission = (amount: number, commission: number) => {
+	return amount * (1 - commission / 100)
+}
+
+export const usdState = atom({
+	key: 'usd',
+	default: 0,
+})
+
+export const eurState = selector<number>({
+	key: 'eur',
+	get: ({ get }) => {
+		let usd = get(usdState)
+
+		const isCommissionEnabled = get(commissionEnabledState)
+		if (isCommissionEnabled) {
+			const commission = get(commissionState)
+			usd = removeCommission(usd, commission)
+		}
+
+		return exchangeRate * usd
+	},
+	set: ({ get, set }, newValue) => {
+		// @ts-ignore
+		let newUsdValue = newValue / exchangeRate
+
+		const isCommissionEnabled = get(commissionEnabledState)
+		if (isCommissionEnabled) {
+			const commission = get(commissionState)
+			newUsdValue = addCommission(newUsdValue, commission)
+		}
+
+		set(usdState, newUsdValue)
+	},
+})
+
+const CurrencyConverter: React.FC = () => {
+	const [usd, setUsd] = useRecoilState(usdState)
+	const [eur, setEur] = useRecoilState(eurState)
 
 	return (
 		<div className={styles.container}>
@@ -21,7 +59,7 @@ const CurrencyConverter: React.FC = () => {
 				<div className={styles.iconWrapper}>
 					<IconArrowRight />
 				</div>
-				<InputGroup label="eur" amount={eur} onChange={handleEurChange} />
+				<InputGroup label="eur" amount={eur} onChange={setEur} />
 			</div>
 			<Commission />
 		</div>
